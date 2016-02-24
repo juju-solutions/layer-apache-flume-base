@@ -1,0 +1,16 @@
+# This file contains values that are likely to change per distribution.
+# The aim is to make it easier to update / extend the charms with
+# minimal changes to the shared code in charmhelpers.
+packages:
+    - 'openjdk-7-jre'
+users:
+    flume:
+        groups: ['flume']
+dirs:
+    flume:
+        path: '/usr/lib/flume'
+    flume_conf:
+        path: '/etc/flume/conf'
+    flume_logs:
+        path: '/var/log/flume'
+        owner: 'flume'

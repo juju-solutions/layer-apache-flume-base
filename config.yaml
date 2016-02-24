@@ -1,0 +1,17 @@
+options:
+    resources_mirror:
+      type: string
+      default: ''
+      description: |
+        URL from which to fetch resources (e.g., Flume binaries) instead of S3
+    channel_capacity:
+      type: string
+      default: '1000'
+      description: |
+        The maximum number of events stored in the channel.
+    channel_transaction_capacity:
+      type: string
+      default: '100'
+      description: |
+        The maximum number of events the channel will take from a source or
+        give to a sink per transaction.
