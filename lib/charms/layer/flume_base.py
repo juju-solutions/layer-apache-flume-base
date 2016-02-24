@@ -6,7 +6,7 @@ from subprocess import Popen, check_output
 import jujuresources
 
 from jujubigdata import utils
-from charmhelpers.core import templating, hookenv
+from charms.templating.jinja2 import render
 
 
 # Main Flume class for callbacks
@@ -26,7 +26,7 @@ class Flume(object):
 
     @property
     def config_file(self):
-        return self.dist_config('flume_conf') / 'flume.conf'
+        return self.dist_config.path('flume_conf') / 'flume.conf'
 
     def install(self):
         '''
@@ -72,14 +72,15 @@ class Flume(object):
         '''
         handle configuration of Flume and setup the environment
         '''
-        config = hookenv.config()
-        templating.render(
+        render(
             source='flume.conf.j2',
             target=self.config_file,
             context=dict({
                 'dist_config': self.dist_config,
-                'config': config,
             }, **(template_data or {})),
+            filters={
+                'agent_list': lambda agents, prefix='': ','.join(['%s%s' % (prefix, a['name']) for a in agents]),
+            },
         )
 
         flume_bin = self.dist_config.path('flume') / 'bin'
