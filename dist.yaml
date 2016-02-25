@@ -3,6 +3,8 @@
 # minimal changes to the shared code in charmhelpers.
 packages:
     - 'openjdk-7-jre'
+groups:
+    - flume
 users:
     flume:
         groups: ['flume']
