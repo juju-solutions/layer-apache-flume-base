@@ -17,8 +17,8 @@ class Flume(object):
     :param DistConfig dist_config: The configuration container object needed.
     """
 
-    def __init__(self, dist_config):
-        self.dist_config = dist_config
+    def __init__(self, dist_config=None):
+        self.dist_config = dist_config or utils.DistConfig()
         self.resources = {
             'flume': 'flume-%s' % utils.cpu_arch(),
         }
