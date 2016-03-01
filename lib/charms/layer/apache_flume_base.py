@@ -18,8 +18,7 @@ class Flume(object):
     :param String user: The username of the user that will start the service.
     """
 
-    def __init__(self, dist_config=None, user='flume'):
-        self.user = user
+    def __init__(self, dist_config=None):
         self.dist_config = dist_config or utils.DistConfig()
         self.resources = {
             'flume': 'flume-%s' % utils.cpu_arch(),
@@ -112,15 +111,15 @@ class Flume(object):
         e = utils.read_etc_env()
         Popen(['su', user, '-c', '{} &> {} &'.format(quoted, output_log)], env=e)
 
-    def restart(self):
+    def restart(self, user='flume'):
         # check for a java process with our flume dir in the classpath
         if utils.jps(r'-cp .*{}'.format(self.dist_config.path('flume'))):
             self.stop()
-        self.start()
+        self.start(user)
 
-    def start(self):
+    def start(self, user='flume'):
         self.run_bg(
-            self.user, '/var/log/flume/flume.out',
+            user, '/var/log/flume/flume.out',
             self.dist_config.path('flume') / 'bin/flume-ng',
             'agent',
             '-c', self.dist_config.path('flume_conf'),
