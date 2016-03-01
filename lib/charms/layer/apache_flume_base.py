@@ -94,7 +94,10 @@ class Flume(object):
             env['FLUME_HOME'] = self.dist_config.path('flume')
             env['JAVA_HOME'] = java_home
 
-    def run_bg(self, user, command, *args):
+    def init_hdfs(self):
+        utils.run_as('flume', 'hdfs', 'dfs', '-mkdir', '-p', '/user/flume')
+
+    def run_bg(self, user, output_log, command, *args):
         """
         Run a command as the given user in the background.
 
@@ -105,7 +108,7 @@ class Flume(object):
         parts = [command] + list(args)
         quoted = ' '.join("'%s'" % p for p in parts)
         e = utils.read_etc_env()
-        Popen(['su', user, '-c', quoted], env=e)
+        Popen(['su', user, '-c', '{} &> {} &'.format(quoted, output_log)], env=e)
 
     def restart(self):
         # check for a java process with our flume dir in the classpath
@@ -115,7 +118,7 @@ class Flume(object):
 
     def start(self):
         self.run_bg(
-            'flume',
+            'flume', '/var/log/flume/flume.out',
             self.dist_config.path('flume') / 'bin/flume-ng',
             'agent',
             '-c', self.dist_config.path('flume_conf'),
