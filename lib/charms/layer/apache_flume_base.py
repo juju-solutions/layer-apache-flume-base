@@ -15,9 +15,11 @@ class Flume(object):
     This class manages the deployment steps of Flume agent.
 
     :param DistConfig dist_config: The configuration container object needed.
+    :param String user: The username of the user that will start the service.
     """
 
-    def __init__(self, dist_config=None):
+    def __init__(self, dist_config=None, user='flume'):
+        self.user = user
         self.dist_config = dist_config or utils.DistConfig()
         self.resources = {
             'flume': 'flume-%s' % utils.cpu_arch(),
@@ -118,7 +120,7 @@ class Flume(object):
 
     def start(self):
         self.run_bg(
-            'flume', '/var/log/flume/flume.out',
+            self.user, '/var/log/flume/flume.out',
             self.dist_config.path('flume') / 'bin/flume-ng',
             'agent',
             '-c', self.dist_config.path('flume_conf'),
