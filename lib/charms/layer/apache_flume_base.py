@@ -23,6 +23,9 @@ class Flume(object):
         self.resources = {
             'flume': 'flume-%s' % utils.cpu_arch(),
         }
+        zk_res = 'zookeeper-%s' % utils.cpu_arch()
+        if jujuresources.resource_defined(zk_res):
+            self.resources['zookeeper'] = zk_res
         self.verify_resources = utils.verify_resources(*self.resources.values())
 
     @property
@@ -38,6 +41,11 @@ class Flume(object):
         jujuresources.install(self.resources['flume'],
                               destination=self.dist_config.path('flume'),
                               skip_top_level=True)
+        if 'zookeeper' in self.resources:
+            # apache-flume-kafka needs ZK libs
+            jujuresources.install(self.resources['zookeeper'],
+                                  destination=self.dist_config.path('zookeeper'),
+                                  skip_top_level=True)
         self.dist_config.add_users()
         self.dist_config.add_dirs()
         self.dist_config.add_packages()
@@ -94,6 +102,12 @@ class Flume(object):
             env['FLUME_CLASSPATH'] = self.dist_config.path('flume') / 'lib'
             env['FLUME_HOME'] = self.dist_config.path('flume')
             env['JAVA_HOME'] = java_home
+
+    def configure_zookeeper(self):
+        flume_env = self.dist_config.path('flume_conf') / 'flume-env.sh'
+        utils.re_edit_in_place(flume_env, {
+            r'.*FLUME_CLASSPATH.*': 'FLUME_CLASSPATH={}/*'.format(self.dist_config.path('zookeeper')),
+        })
 
     def init_hdfs(self):
         utils.run_as('flume', 'hdfs', 'dfs', '-mkdir', '-p', '/user/flume')
