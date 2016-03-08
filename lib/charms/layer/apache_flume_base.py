@@ -26,7 +26,8 @@ class Flume(object):
         zk_res = 'zookeeper-%s' % utils.cpu_arch()
         if jujuresources.resource_defined(zk_res):
             self.resources['zookeeper'] = zk_res
-        self.verify_resources = utils.verify_resources(*self.resources.values())
+        self.verify_resources = utils.verify_resources(
+            *self.resources.values())
 
     @property
     def config_file(self):
@@ -34,18 +35,21 @@ class Flume(object):
 
     def install(self):
         '''
-        Create the users and directories. This method is to be called only once.
+        Create the users and directories.
+        This method is to be called only once.
 
-        :param bool force: Force the installation execution even if this is not the first installation attempt.
+        :param bool force: Force the installation execution even if this
+                           is not the first installation attempt.
         '''
         jujuresources.install(self.resources['flume'],
                               destination=self.dist_config.path('flume'),
                               skip_top_level=True)
         if 'zookeeper' in self.resources:
             # apache-flume-kafka needs ZK libs
-            jujuresources.install(self.resources['zookeeper'],
-                                  destination=self.dist_config.path('zookeeper'),
-                                  skip_top_level=True)
+            jujuresources.install(
+                self.resources['zookeeper'],
+                destination=self.dist_config.path('zookeeper'),
+                skip_top_level=True)
         self.dist_config.add_users()
         self.dist_config.add_dirs()
         self.dist_config.add_packages()
@@ -64,17 +68,19 @@ class Flume(object):
         default_conf.rmtree_p()
         flume_conf.symlink(default_conf)
 
-        flume_env = self.dist_config.path('flume_conf') / 'flume-env.sh'
+        flume_env = flume_conf / 'flume-env.sh'
         if not flume_env.exists():
-            (self.dist_config.path('flume_conf') / 'flume-env.sh.template').copy(flume_env)
+            (flume_conf / 'flume-env.sh.template').copy(flume_env)
 
-        flume_conf = self.dist_config.path('flume_conf') / 'flume.conf'
-        if not flume_conf.exists():
-            (self.dist_config.path('flume_conf') / 'flume-conf.properties.template').copy(flume_conf)
+        flume_conf_src = flume_conf / 'flume-conf.properties.template'
+        flume_conf_dst = flume_conf / 'flume.conf'
+        if not flume_conf_dst.exists():
+            flume_conf_src.copy(flume_conf_dst)
 
         flume_log4j = self.dist_config.path('flume_conf') / 'log4j.properties'
+        flume_logs = self.dist_config.path('flume_logs')
         utils.re_edit_in_place(flume_log4j, {
-            r'^flume.log.dir.*': 'flume.log.dir={}'.format(self.dist_config.path('flume_logs')),
+            r'^flume.log.dir.*': 'flume.log.dir={}'.format(flume_logs),
         })
 
     def configure_flume(self, template_data=None):
@@ -88,12 +94,15 @@ class Flume(object):
                 'dist_config': self.dist_config,
             }, **(template_data or {})),
             filters={
-                'agent_list': lambda agents, prefix='': ','.join(['%s%s' % (prefix, a['name']) for a in agents]),
+                'agent_list': lambda agents, prefix='': ','.join([
+                    '%s%s' % (prefix, a['name']) for a in agents
+                ]),
             },
         )
 
         flume_bin = self.dist_config.path('flume') / 'bin'
-        java_symlink = check_output(["readlink", "-f", "/usr/bin/java"]).decode('utf8')
+        java_symlink = check_output(
+            ["readlink", "-f", "/usr/bin/java"]).decode('utf8')
         java_home = re.sub('/bin/java', '', java_symlink).rstrip()
         with utils.environment_edit_in_place('/etc/environment') as env:
             if flume_bin not in env['PATH']:
@@ -105,8 +114,9 @@ class Flume(object):
 
     def configure_zookeeper(self):
         flume_env = self.dist_config.path('flume_conf') / 'flume-env.sh'
+        zk_path = self.dist_config.path('zookeeper')
         utils.re_edit_in_place(flume_env, {
-            r'.*FLUME_CLASSPATH.*': 'FLUME_CLASSPATH={}/*'.format(self.dist_config.path('zookeeper')),
+            r'.*FLUME_CLASSPATH.*': 'FLUME_CLASSPATH={}/*'.format(zk_path),
         })
 
     def init_hdfs(self):
@@ -123,7 +133,8 @@ class Flume(object):
         parts = [command] + list(args)
         quoted = ' '.join("'%s'" % p for p in parts)
         e = utils.read_etc_env()
-        Popen(['su', user, '-c', '{} &> {} &'.format(quoted, output_log)], env=e)
+        Popen(['su', user, '-c', '{} &> {} &'.format(quoted, output_log)],
+              env=e)
 
     def restart(self, user='flume'):
         # check for a java process with our flume dir in the classpath
@@ -141,7 +152,8 @@ class Flume(object):
             '-n', 'a1')
 
     def stop(self):
-        flume_pids = utils.jps(r'-cp .*{}'.format(self.dist_config.path('flume')))
+        flume_path = self.dist_config.path('flume')
+        flume_pids = utils.jps(r'-cp .*{}'.format(flume_path))
         for pid in flume_pids:
             os.kill(int(pid), signal.SIGKILL)
 
