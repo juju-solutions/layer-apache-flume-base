@@ -7,7 +7,7 @@ groups:
     - flume
 users:
     flume:
-        groups: ['flume']
+        groups: ['flume', 'hadoop']
 dirs:
     flume:
         path: '/usr/lib/flume'

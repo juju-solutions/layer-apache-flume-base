@@ -120,7 +120,8 @@ class Flume(object):
         })
 
     def init_hdfs(self):
-        utils.run_as('flume', 'hdfs', 'dfs', '-mkdir', '-p', '/user/flume')
+        utils.run_as('hdfs', 'hdfs', 'dfs', '-mkdir', '-p', '/user/flume')
+        utils.run_as('hdfs', 'hdfs', 'dfs', '-chown', 'flume', '/user/flume')
 
     def run_bg(self, user, output_log, command, *args):
         """
