@@ -5,6 +5,7 @@ packages:
     - 'openjdk-7-jre'
 groups:
     - flume
+    - hadoop
 users:
     flume:
         groups: ['flume', 'hadoop']
