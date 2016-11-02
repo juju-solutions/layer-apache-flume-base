@@ -21,7 +21,7 @@ class Flume(object):
     def __init__(self, dist_config=None):
         self.dist_config = dist_config or utils.DistConfig()
         self.resources = {
-            'flume': 'flume-%s' % utils.cpu_arch(),
+            'flume': 'flume',
         }
         zk_res = 'zookeeper-%s' % utils.cpu_arch()
         if jujuresources.resource_defined(zk_res):
