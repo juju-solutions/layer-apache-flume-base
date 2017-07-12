@@ -1,8 +1,6 @@
 # This file contains values that are likely to change per distribution.
 # The aim is to make it easier to update / extend the charms with
 # minimal changes to the shared code in charmhelpers.
-packages:
-    - 'openjdk-7-jre'
 groups:
     - flume
     - hadoop
