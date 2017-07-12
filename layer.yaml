@@ -1,1 +1,6 @@
-includes: ['layer:basic']
+includes:
+  - 'layer:basic'
+options:
+  basic:
+    packages:
+      - openjdk-8-jdk-headless # needed for 'jps'

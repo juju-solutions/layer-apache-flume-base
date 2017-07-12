@@ -1,2 +1,3 @@
-maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"
-tags: ["applications", "bigdata", "apache"]
+maintainer: Juju Big Data <bigdata@lists.ubuntu.com>
+tags: ["apache", "big_data"]
+series: ["xenial"]
