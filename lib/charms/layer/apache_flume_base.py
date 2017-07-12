@@ -52,7 +52,6 @@ class Flume(object):
                 skip_top_level=True)
         self.dist_config.add_users()
         self.dist_config.add_dirs()
-        self.dist_config.add_packages()
         self.setup_flume_config()
 
     def setup_flume_config(self):
