@@ -1,4 +1,4 @@
-## Overview
+# Overview
 
 This is the base layer for the Apache Flume charms.  It will handle installing
 the Apache Flume libraries and any dependencies, and provides helpers to
@@ -50,12 +50,12 @@ def configure(sink):
 ```
 
 
-## Contact Information
+# Contact Information
 
 - <bigdata@lists.ubuntu.com>
 
 
-## Help
+# Resources
 
 - [Apache Flume home page](http://flume.apache.org/)
 - [Apache Flume bug tracker](https://issues.apache.org/jira/browse/flume)

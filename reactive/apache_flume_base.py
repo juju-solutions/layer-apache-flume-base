@@ -12,4 +12,5 @@ def install_flume():
     if flume.verify_resources():
         hookenv.status_set('maintenance', 'Installing Flume')
         flume.install()
+        hookenv.status_set('waiting', 'Waiting for Flume to become Ready')
         set_state('flume-base.installed')
